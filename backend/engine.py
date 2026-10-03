@@ -2,229 +2,307 @@ from model import predict_channel
 
 
 # ---------------------------------------------------------
-# DEMO ASSUMPTIONS
-# These are prototype assumptions, NOT official ACV/Copart fees.
-# In production, these values would come from real company data.
+# PROTOTYPE ASSUMPTIONS
+# These are NOT official ACV or Copart fees.
 # ---------------------------------------------------------
 
 ACV_FEE_RATE = 0.02
-COPART_FEE_RATE = 0.025
+COPART_FEE_RATE = 0.04
 
 ACV_TRANSPORT_COST = 250
 COPART_TRANSPORT_COST = 350
 
 
+def clamp(value, minimum, maximum):
+    return max(minimum, min(value, maximum))
+
+
 def estimate_acv_sale_price(vehicle):
-    """
-    Estimate expected ACV wholesale sale price.
-
-    This is a prototype heuristic.
-    """
-
     market_value = vehicle["market_value"]
     condition = vehicle["condition_score"]
     damage = vehicle["damage_severity"]
     mileage = vehicle["mileage"]
     salvage_title = vehicle["salvage_title"]
 
-    multiplier = 0.90
+    multiplier = 0.94
 
-    # Better condition helps ACV wholesale value
-    multiplier += (condition - 70) * 0.002
-
-    # Damage reduces wholesale value
+    multiplier += (condition - 75) * 0.002
     multiplier -= damage * 0.04
 
-    # Very high mileage reduces demand
-    if mileage > 120000:
+    if mileage > 100000:
         multiplier -= 0.05
 
-    if mileage > 180000:
-        multiplier -= 0.05
+    if mileage > 150000:
+        multiplier -= 0.08
 
-    # Salvage title hurts dealer-wholesale economics heavily
-    if salvage_title == 1:
-        multiplier -= 0.25
+    if salvage_title:
+        multiplier -= 0.30
 
-    # Prevent unrealistic values
-    multiplier = max(0.30, min(multiplier, 1.00))
+    multiplier = clamp(multiplier, 0.25, 1.00)
 
     return market_value * multiplier
 
 
 def estimate_copart_sale_price(vehicle):
-    """
-    Estimate expected Copart salvage sale price.
-
-    This is a prototype heuristic.
-    """
-
     market_value = vehicle["market_value"]
     condition = vehicle["condition_score"]
     damage = vehicle["damage_severity"]
     salvage_title = vehicle["salvage_title"]
 
-    # Salvage recovery percentage of market value
-    salvage_multipliers = {
-        0: 0.70,
-        1: 0.65,
-        2: 0.55,
-        3: 0.45,
-        4: 0.35
+    multipliers = {
+        0: 0.68,
+        1: 0.64,
+        2: 0.58,
+        3: 0.48,
+        4: 0.40
     }
 
-    multiplier = salvage_multipliers.get(damage, 0.40)
+    multiplier = multipliers.get(damage, 0.45)
 
-    # Better condition slightly increases salvage auction value
     multiplier += (condition - 50) * 0.001
 
-    # Salvage title is less damaging inside a salvage marketplace
-    if salvage_title == 1:
-        multiplier += 0.03
+    if salvage_title:
+        multiplier += 0.04
 
-    multiplier = max(0.20, min(multiplier, 0.80))
+    multiplier = clamp(multiplier, 0.20, 0.80)
 
     return market_value * multiplier
 
 
-def calculate_acv_net(vehicle):
-    expected_sale_price = estimate_acv_sale_price(vehicle)
-
-    fee = expected_sale_price * ACV_FEE_RATE
-
-    # Assume some reconditioning may be needed for wholesale
-    reconditioning_cost = vehicle["repair_cost"]
-
-    net = (
-        expected_sale_price
-        - fee
-        - ACV_TRANSPORT_COST
-        - reconditioning_cost
-    )
-
-    return {
-        "expected_sale_price": round(expected_sale_price, 2),
-        "fee": round(fee, 2),
-        "transport_cost": ACV_TRANSPORT_COST,
-        "repair_cost": round(reconditioning_cost, 2),
-        "net_proceeds": round(net, 2)
-    }
-
-
-def calculate_copart_net(vehicle):
-    expected_sale_price = estimate_copart_sale_price(vehicle)
-
-    fee = expected_sale_price * COPART_FEE_RATE
-
-    # Salvage route assumes vehicle is sold as-is
-    repair_cost = 0
-
-    net = (
-        expected_sale_price
-        - fee
-        - COPART_TRANSPORT_COST
-    )
-
-    return {
-        "expected_sale_price": round(expected_sale_price, 2),
-        "fee": round(fee, 2),
-        "transport_cost": COPART_TRANSPORT_COST,
-        "repair_cost": repair_cost,
-        "net_proceeds": round(net, 2)
-    }
-
-
-def analyze_vehicle(vehicle):
+def calculate_range(net, uncertainty):
     """
-    Complete ReDrive analysis:
-    1. ML suitability
-    2. Economic calculations
-    3. Final recommendation based on seller net proceeds
+    Turn one prototype estimate into an uncertainty range.
+
+    p10 = conservative outcome
+    p50 = expected outcome
+    p90 = optimistic outcome
     """
 
-    ml_result = predict_channel(vehicle)
-
-    acv = calculate_acv_net(vehicle)
-    copart = calculate_copart_net(vehicle)
-
-    if acv["net_proceeds"] >= copart["net_proceeds"]:
-        recommendation = "ACV"
-        advantage = acv["net_proceeds"] - copart["net_proceeds"]
-    else:
-        recommendation = "COPART"
-        advantage = copart["net_proceeds"] - acv["net_proceeds"]
+    p10 = max(0, net * (1 - uncertainty))
+    p50 = max(0, net)
+    p90 = max(0, net * (1 + uncertainty * 0.65))
 
     return {
-        "recommendation": recommendation,
-        "net_advantage": round(advantage, 2),
-        "ml": ml_result,
-        "acv": acv,
-        "copart": copart
+        "p10": round(p10),
+        "p50": round(p50),
+        "p90": round(p90)
     }
 
 
-if __name__ == "__main__":
+def acv_explanation(vehicle, ml):
+    if vehicle["salvage_title"]:
+        return (
+            "Dealer demand is limited by title and condition risk, "
+            "which reduces expected wholesale proceeds."
+        )
 
-    test_vehicles = [
-        {
-            "name": "Good condition vehicle",
-            "age": 5,
-            "mileage": 65000,
-            "condition_score": 85,
-            "damage_severity": 1,
-            "repair_cost": 800,
-            "market_value": 22000,
-            "salvage_title": 0
+    if vehicle["condition_score"] >= 75:
+        return (
+            "The vehicle's condition, title profile and dealer-market "
+            "suitability support a stronger wholesale outcome."
+        )
+
+    return (
+        "Wholesale remains viable, but condition and reconditioning "
+        "costs reduce dealer bidding strength."
+    )
+
+
+def copart_explanation(vehicle, ml):
+    if vehicle["salvage_title"] or vehicle["damage_severity"] >= 3:
+        return (
+            "Selling as-is avoids heavy reconditioning costs and gives "
+            "the vehicle access to salvage, rebuilder and dismantler demand."
+        )
+
+    return (
+        "The salvage channel provides a reliable as-is exit, but buyers "
+        "discount vehicles that still have strong wholesale utility."
+    )
+
+
+def calculate_acv_route(vehicle, ml):
+    expected_price = estimate_acv_sale_price(vehicle)
+
+    fees = expected_price * ACV_FEE_RATE
+    transport = ACV_TRANSPORT_COST
+    recon = vehicle["repair_cost"]
+
+    holding = 150 + vehicle["age"] * 10
+
+    # ML suitability helps determine uncertainty/risk.
+    risk = (
+        (1 - ml["acv_probability"]) * 1500
+        + vehicle["damage_severity"] * 150
+    )
+
+    net = (
+        expected_price
+        - fees
+        - transport
+        - recon
+        - holding
+        - risk
+    )
+
+    uncertainty = (
+        0.05
+        + vehicle["damage_severity"] * 0.025
+        + (1 - ml["acv_probability"]) * 0.08
+    )
+
+    uncertainty = clamp(uncertainty, 0.05, 0.25)
+
+    return {
+        "channel": "acv_wholesale",
+
+        "net": calculate_range(net, uncertainty),
+
+        "breakdown": {
+            "expected_price": round(expected_price),
+            "fees": round(fees),
+            "transport": round(transport),
+            "recon": round(recon),
+            "holding": round(holding),
+            "risk": round(risk)
         },
 
-        {
-            "name": "Heavily damaged vehicle",
-            "age": 10,
-            "mileage": 135000,
-            "condition_score": 30,
-            "damage_severity": 4,
-            "repair_cost": 11000,
-            "market_value": 15000,
-            "salvage_title": 1
-        }
+        "days_to_sell": round(
+            clamp(
+                5 + vehicle["damage_severity"] + vehicle["age"] * 0.1,
+                4,
+                14
+            )
+        ),
+
+        "explanation": acv_explanation(vehicle, ml)
+    }
+
+
+def calculate_copart_route(vehicle, ml):
+    expected_price = estimate_copart_sale_price(vehicle)
+
+    fees = expected_price * COPART_FEE_RATE
+    transport = COPART_TRANSPORT_COST
+
+    # Sold as-is.
+    recon = 0
+
+    holding = 200
+
+    risk = (
+        (1 - ml["copart_probability"]) * 700
+    )
+
+    net = (
+        expected_price
+        - fees
+        - transport
+        - recon
+        - holding
+        - risk
+    )
+
+    uncertainty = (
+        0.07
+        + (1 - ml["copart_probability"]) * 0.07
+    )
+
+    uncertainty = clamp(uncertainty, 0.06, 0.22)
+
+    return {
+        "channel": "copart_salvage",
+
+        "net": calculate_range(net, uncertainty),
+
+        "breakdown": {
+            "expected_price": round(expected_price),
+            "fees": round(fees),
+            "transport": round(transport),
+            "recon": round(recon),
+            "holding": round(holding),
+            "risk": round(risk)
+        },
+
+        "days_to_sell": round(
+            clamp(
+                9 - vehicle["damage_severity"] * 0.4,
+                6,
+                12
+            )
+        ),
+
+        "explanation": copart_explanation(vehicle, ml)
+    }
+
+
+def analyze_vehicle(vehicle, seller_type):
+    """
+    Return output matching the frontend API contract.
+    """
+
+    ml = predict_channel(vehicle)
+
+    all_routes = [
+        calculate_acv_route(vehicle, ml),
+        calculate_copart_route(vehicle, ml)
     ]
 
-    for vehicle in test_vehicles:
+    # Frontend contract:
+    # individuals can only use Copart.
+    if seller_type == "individual":
+        eligible_routes = [
+            route
+            for route in all_routes
+            if route["channel"] == "copart_salvage"
+        ]
+    else:
+        eligible_routes = all_routes
 
-        print("\n===================================")
-        print(vehicle["name"])
-        print("===================================")
+    eligible_routes.sort(
+        key=lambda route: route["net"]["p50"],
+        reverse=True
+    )
 
-        result = analyze_vehicle(vehicle)
+    recommended = eligible_routes[0]["channel"]
 
-        print("\nML Suitability:")
-        print(
-            f"ACV: {result['ml']['acv_probability']:.1%}"
+    if len(eligible_routes) > 1:
+        delta = (
+            eligible_routes[0]["net"]["p50"]
+            - eligible_routes[1]["net"]["p50"]
         )
-        print(
-            f"Copart: {result['ml']['copart_probability']:.1%}"
-        )
+    else:
+        delta = None
 
-        print("\nACV:")
-        print(
-            f"Expected sale: ${result['acv']['expected_sale_price']:,.2f}"
-        )
-        print(
-            f"Net proceeds:  ${result['acv']['net_proceeds']:,.2f}"
-        )
+    return {
+        "vehicle": {
+            "vin": vehicle["vin"],
+            "year": vehicle["year"],
+            "make": vehicle["make"],
+            "model": vehicle["model"],
+            "trim": vehicle["trim"],
+            "mileage": vehicle["mileage"]
+        },
 
-        print("\nCopart:")
-        print(
-            f"Expected sale: ${result['copart']['expected_sale_price']:,.2f}"
-        )
-        print(
-            f"Net proceeds:  ${result['copart']['net_proceeds']:,.2f}"
-        )
+        "damage": vehicle["damage"],
 
-        print("\nFINAL RECOMMENDATION:")
-        print(result["recommendation"])
+        "routes": eligible_routes,
 
-        print(
-            f"Estimated seller advantage: "
-            f"${result['net_advantage']:,.2f}"
-        )
+        "recommended": recommended,
+
+        "delta_vs_next_best": delta,
+
+        # Internal/debug information.
+        # Frontend safely ignores extra JSON fields.
+        "model_debug": {
+            "classifier_prediction": ml["prediction"],
+            "acv_probability": round(
+                ml["acv_probability"],
+                4
+            ),
+            "copart_probability": round(
+                ml["copart_probability"],
+                4
+            )
+        }
+    }
