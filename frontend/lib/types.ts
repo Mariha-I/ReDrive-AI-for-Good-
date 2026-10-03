@@ -89,3 +89,44 @@ export interface VehicleInput {
   photos: File[];
   obd_codes: string[];
 }
+
+export interface ReconItem {
+  id: string;
+  name: string;
+  kind: "repair" | "upgrade";
+  description: string;
+  cost: number;
+  /** Increase in expected sale price from this item alone */
+  value_lift: number;
+  /** value_lift − cost, computed by the backend */
+  net_gain: number;
+  days_added: number;
+  /** Part of the recommended package */
+  recommended: boolean;
+  reason: string;
+}
+
+export interface ReconScenario {
+  channel: Channel;
+  as_is: NetRange;
+  reconditioned: {
+    net: NetRange;
+    breakdown: Breakdown;
+    days_to_sell: number;
+  };
+  /** reconditioned.net.p50 − as_is.p50 */
+  net_change: number;
+  explanation: string;
+}
+
+export interface ReconResponse {
+  vehicle: Vehicle;
+  /** Every candidate repair or upgrade, recommended or not */
+  items: ReconItem[];
+  /** Eligible channels only, sorted by reconditioned.net.p50 descending */
+  scenarios: ReconScenario[];
+  recommended_channel: Channel;
+  verdict: "recondition" | "sell_as_is";
+  /** Total cost of the recommended items */
+  package_cost: number;
+}

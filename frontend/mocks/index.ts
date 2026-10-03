@@ -1,7 +1,10 @@
-import type { RouteResponse } from "@/lib/types";
+import type { ReconResponse, RouteResponse } from "@/lib/types";
 import rav4 from "./rav4.json";
 import accord from "./accord.json";
 import f150 from "./f150.json";
+import rav4Recon from "./recon/rav4.json";
+import accordRecon from "./recon/accord.json";
+import f150Recon from "./recon/f150.json";
 
 export interface DemoVehicle {
   id: string;
@@ -12,6 +15,8 @@ export interface DemoVehicle {
   obd_codes: string[];
   /** Full response for a seller who can use every channel; the mock API filters by seller type. */
   response: RouteResponse;
+  /** Full reconditioning analysis for a seller who can use every channel */
+  recon: ReconResponse;
 }
 
 export const DEMO_VEHICLES: DemoVehicle[] = [
@@ -23,6 +28,7 @@ export const DEMO_VEHICLES: DemoVehicle[] = [
     zip: "30303",
     obd_codes: [],
     response: rav4 as RouteResponse,
+    recon: rav4Recon as ReconResponse,
   },
   {
     id: "accord",
@@ -32,6 +38,7 @@ export const DEMO_VEHICLES: DemoVehicle[] = [
     zip: "75201",
     obd_codes: [],
     response: accord as RouteResponse,
+    recon: accordRecon as ReconResponse,
   },
   {
     id: "f150",
@@ -41,5 +48,6 @@ export const DEMO_VEHICLES: DemoVehicle[] = [
     zip: "77002",
     obd_codes: ["P0300", "B1318"],
     response: f150 as RouteResponse,
+    recon: f150Recon as ReconResponse,
   },
 ];

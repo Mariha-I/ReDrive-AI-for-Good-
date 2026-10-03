@@ -74,6 +74,46 @@ Response:
 ```
 Summary uses each vehicle's recommended route. `by_channel` is sorted by `net.p50` descending.
 
+### POST /recondition (repairs and upgrades for one vehicle)
+Multipart: seller_type, vin, mileage, zip, photos[], obd_codes[] optional
+
+Response:
+```json
+{
+  "vehicle": { "vin": "1HGCV1F34LA000002", "year": 2020, "make": "Honda", "model": "Accord", "trim": "Sport", "mileage": 64000 },
+  "items": [
+    {
+      "id": "pdr", "name": "Paintless dent repair (hood, roof, trunk lid)", "kind": "repair",
+      "description": "PDR technician removes hail dents without repainting.",
+      "cost": 2400, "value_lift": 3900, "net_gain": 1500, "days_added": 5,
+      "recommended": true, "reason": "Removes the hail disclosure entirely, so buyers bid it as a clean car."
+    }
+  ],
+  "scenarios": [
+    {
+      "channel": "acv_wholesale",
+      "as_is": { "p10": 15400, "p50": 16500, "p90": 17300 },
+      "reconditioned": {
+        "net": { "p10": 17000, "p50": 18150, "p90": 19000 },
+        "breakdown": { "expected_price": 22150, "fees": 450, "transport": 250, "recon": 2700, "holding": 450, "risk": 150 },
+        "days_to_sell": 11
+      },
+      "net_change": 1650,
+      "explanation": "With the hail removed, this sells as a clean-title, clean-body Accord."
+    }
+  ],
+  "recommended_channel": "acv_wholesale",
+  "verdict": "recondition",
+  "package_cost": 2700
+}
+```
+- `items` lists every candidate repair (`kind: "repair"`) or upgrade (`kind: "upgrade"`), recommended or not.
+  Item figures (`value_lift`, `net_gain`) are for `recommended_channel`.
+- `scenarios` covers eligible channels only, assuming the recommended items are done, sorted by
+  `reconditioned.net.p50` descending. `net_change` = reconditioned p50 − as-is p50.
+- `verdict` is `"sell_as_is"` (and no item is recommended, `package_cost` 0) when reconditioning doesn't pay
+  off in any eligible channel.
+
 ## UI requirements
 - Screen 1: seller type picker (Individual / Business / Dealer).
 - Screen 2: left panel intake form (one or more vehicles: VIN, mileage, ZIP, photo drag-and-drop with thumbnails,
@@ -82,6 +122,9 @@ Summary uses each vehicle's recommended route. `by_channel` is sorted by `net.p5
     route cards with an expandable cost breakdown, damage summary card.
   - Multiple vehicles: fleet totals, selectable per-channel groups, per-vehicle table with drill-down.
   - A "Start Selling" button acts on the selected option and redirects to the ACV or Copart website.
+  - Below the sale options, a visually distinct "Analyze Reconditioning Options" card links to `/recondition`:
+    a page listing repairs/upgrades with cost, value added and net gain, an as-is vs reconditioned comparison
+    per channel with cost breakdowns, and its own Start Selling bar.
 - Loading state that feels intentional (stepwise: "Decoding VIN… Reading damage… Pricing routes…").
 - Responsive; must look good projected on a screen for judges. Clean, professional, automotive feel.
 - Brand: "ReDrive". Never show ACV or Copart names or logos in the UI.
