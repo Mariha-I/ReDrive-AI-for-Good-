@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* Light-only on purpose: the app is projected for judges, and dark UIs wash out on projectors. */
+:root {
+  --background: #f4f6f9;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: #0b2545;
+  --color-brand-ink: #13315c;
+  --color-lane: #047857;
+  --color-lane-soft: #ecfdf5;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fade-up 320ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up { animation: none; }
+}

@@ -1,0 +1,73 @@
+{
+  "vehicle": {
+    "vin": "1FTFW1E50NFA00000",
+    "year": 2022,
+    "make": "Ford",
+    "model": "F-150",
+    "trim": "XLT",
+    "mileage": 161000
+  },
+  "damage": {
+    "summary": "Flood indicators on interior carpet and seat rails; moderate front bumper damage.",
+    "items": [
+      {
+        "panel": "interior_carpet",
+        "severity": 4,
+        "structural": false
+      },
+      {
+        "panel": "seat_rails",
+        "severity": 3,
+        "structural": false
+      },
+      {
+        "panel": "front_bumper",
+        "severity": 3,
+        "structural": false
+      }
+    ],
+    "flood_risk": true,
+    "airbags_deployed": false,
+    "confidence": 0.82
+  },
+  "routes": [
+    {
+      "channel": "copart_salvage",
+      "net": {
+        "p10": 8000,
+        "p50": 9300,
+        "p90": 10400
+      },
+      "breakdown": {
+        "expected_price": 11800,
+        "fees": 950,
+        "transport": 350,
+        "recon": 0,
+        "holding": 300,
+        "risk": 900
+      },
+      "days_to_sell": 10,
+      "explanation": "US rebuilders will buy it, but a flood history plus 161k miles limits how much they can resell it for after repair."
+    },
+    {
+      "channel": "acv_wholesale",
+      "net": {
+        "p10": 4800,
+        "p50": 7250,
+        "p90": 9000
+      },
+      "breakdown": {
+        "expected_price": 10900,
+        "fees": 450,
+        "transport": 300,
+        "recon": 0,
+        "holding": 300,
+        "risk": 2600
+      },
+      "days_to_sell": 9,
+      "explanation": "Dealers bid cautiously on disclosed flood vehicles, and arbitration risk is high. The wide range reflects how uncertain this outcome is."
+    }
+  ],
+  "recommended": "copart_salvage",
+  "delta_vs_next_best": 2050
+}
