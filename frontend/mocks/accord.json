@@ -1,0 +1,73 @@
+{
+  "vehicle": {
+    "vin": "1HGCV1F34LA000002",
+    "year": 2020,
+    "make": "Honda",
+    "model": "Accord",
+    "trim": "Sport",
+    "mileage": 64000
+  },
+  "damage": {
+    "summary": "Widespread hail dimpling across the hood, roof and trunk lid. Paint is intact and there is no glass or structural damage.",
+    "items": [
+      {
+        "panel": "hood",
+        "severity": 3,
+        "structural": false
+      },
+      {
+        "panel": "roof",
+        "severity": 3,
+        "structural": false
+      },
+      {
+        "panel": "trunk_lid",
+        "severity": 2,
+        "structural": false
+      }
+    ],
+    "flood_risk": false,
+    "airbags_deployed": false,
+    "confidence": 0.87
+  },
+  "routes": [
+    {
+      "channel": "acv_wholesale",
+      "net": {
+        "p10": 15400,
+        "p50": 16500,
+        "p90": 17300
+      },
+      "breakdown": {
+        "expected_price": 17800,
+        "fees": 400,
+        "transport": 250,
+        "recon": 0,
+        "holding": 200,
+        "risk": 450
+      },
+      "days_to_sell": 6,
+      "explanation": "With the hail fully disclosed in the condition report, dealers with in-house paintless dent repair will bid aggressively. It's a clean title and mechanically sound, so it doesn't belong in salvage."
+    },
+    {
+      "channel": "copart_salvage",
+      "net": {
+        "p10": 12000,
+        "p50": 13100,
+        "p90": 14100
+      },
+      "breakdown": {
+        "expected_price": 14600,
+        "fees": 850,
+        "transport": 300,
+        "recon": 0,
+        "holding": 250,
+        "risk": 100
+      },
+      "days_to_sell": 9,
+      "explanation": "Salvage buyers discount hail cars heavily even when the damage is cosmetic, but the sale is fast and certain with no repair costs."
+    }
+  ],
+  "recommended": "acv_wholesale",
+  "delta_vs_next_best": 3400
+}

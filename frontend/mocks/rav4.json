@@ -1,0 +1,63 @@
+{
+  "vehicle": {
+    "vin": "2T3P1RFV5PW000001",
+    "year": 2023,
+    "make": "Toyota",
+    "model": "RAV4",
+    "trim": "XLE",
+    "mileage": 28000
+  },
+  "damage": {
+    "summary": "No significant damage detected. Light wear on the driver seat bolster; all panels straight with original paint.",
+    "items": [
+      {
+        "panel": "driver_seat",
+        "severity": 1,
+        "structural": false
+      }
+    ],
+    "flood_risk": false,
+    "airbags_deployed": false,
+    "confidence": 0.91
+  },
+  "routes": [
+    {
+      "channel": "acv_wholesale",
+      "net": {
+        "p10": 28100,
+        "p50": 29200,
+        "p90": 30100
+      },
+      "breakdown": {
+        "expected_price": 30500,
+        "fees": 450,
+        "transport": 250,
+        "recon": 300,
+        "holding": 150,
+        "risk": 150
+      },
+      "days_to_sell": 5,
+      "explanation": "Low-mile late-model RAV4s are among the most bid-on SUVs in dealer auctions. You get near-retail money in about a week with almost no reconditioning or holding cost."
+    },
+    {
+      "channel": "copart_salvage",
+      "net": {
+        "p10": 19500,
+        "p50": 21000,
+        "p90": 22300
+      },
+      "breakdown": {
+        "expected_price": 22500,
+        "fees": 900,
+        "transport": 300,
+        "recon": 0,
+        "holding": 200,
+        "risk": 100
+      },
+      "days_to_sell": 10,
+      "explanation": "Salvage buyers price in repair work this car doesn't need, so bids come in well below clean-car value. It still sells quickly with no reconditioning."
+    }
+  ],
+  "recommended": "acv_wholesale",
+  "delta_vs_next_best": 8200
+}
