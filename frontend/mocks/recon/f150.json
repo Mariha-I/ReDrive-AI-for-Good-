@@ -1,0 +1,80 @@
+{
+  "vehicle": { "vin": "1FTFW1E50NFA00000", "year": 2022, "make": "Ford", "model": "F-150", "trim": "XLT", "mileage": 161000 },
+  "items": [
+    {
+      "id": "misfire",
+      "name": "Fix misfire (plugs and coil packs)",
+      "kind": "repair",
+      "description": "Diagnose code P0300, replace spark plugs and the failed coil pack.",
+      "cost": 420,
+      "value_lift": 900,
+      "net_gain": 480,
+      "days_added": 1,
+      "recommended": true,
+      "reason": "A truck that runs smoothly with no check-engine light draws far more bidders."
+    },
+    {
+      "id": "bumper",
+      "name": "Replace front bumper cover",
+      "kind": "repair",
+      "description": "Aftermarket bumper cover, painted to match, installed.",
+      "cost": 650,
+      "value_lift": 900,
+      "net_gain": 250,
+      "days_added": 2,
+      "recommended": true,
+      "reason": "Visible front damage is the first thing buyers see in listing photos."
+    },
+    {
+      "id": "dryout",
+      "name": "Interior dry-out and deodorize",
+      "kind": "repair",
+      "description": "Extract moisture, treat for mildew and run an ozone odor treatment.",
+      "cost": 180,
+      "value_lift": 400,
+      "net_gain": 220,
+      "days_added": 1,
+      "recommended": true,
+      "reason": "Musty odor is the biggest driver of low bids on flood vehicles."
+    },
+    {
+      "id": "flood_full",
+      "name": "Full flood remediation",
+      "kind": "repair",
+      "description": "Replace carpet, padding and seat rails, plus a full electrical inspection.",
+      "cost": 3200,
+      "value_lift": 1800,
+      "net_gain": -1400,
+      "days_added": 10,
+      "recommended": false,
+      "reason": "The title stays flood-branded either way, so buyers won't pay this back."
+    }
+  ],
+  "scenarios": [
+    {
+      "channel": "copart_salvage",
+      "as_is": { "p10": 8000, "p50": 9300, "p90": 10400 },
+      "reconditioned": {
+        "net": { "p10": 8600, "p50": 9840, "p90": 10900 },
+        "breakdown": { "expected_price": 13500, "fees": 1000, "transport": 350, "recon": 1250, "holding": 360, "risk": 700 },
+        "days_to_sell": 12
+      },
+      "net_change": 540,
+      "explanation": "Low-cost fixes that make the truck run and look right pay off, even at a salvage sale. Skip the full flood remediation."
+    },
+    {
+      "channel": "acv_wholesale",
+      "as_is": { "p10": 4800, "p50": 7250, "p90": 9000 },
+      "reconditioned": {
+        "net": { "p10": 5300, "p50": 7720, "p90": 9500 },
+        "breakdown": { "expected_price": 12400, "fees": 470, "transport": 300, "recon": 1250, "holding": 360, "risk": 2300 },
+        "days_to_sell": 11
+      },
+      "net_change": 470,
+      "explanation": "The repairs help, but dealers still discount the flood history heavily, so this stays the weaker option."
+    }
+  ],
+  "recommended_channel": "copart_salvage",
+  "verdict": "recondition",
+  "package_cost": 1250
+}

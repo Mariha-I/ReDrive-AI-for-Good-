@@ -1,0 +1,134 @@
+{
+  "vehicle": {
+    "vin": "2T3P1RFV5PW000001",
+    "year": 2023,
+    "make": "Toyota",
+    "model": "RAV4",
+    "trim": "XLE",
+    "mileage": 28000
+  },
+  "items": [
+    {
+      "id": "detail",
+      "name": "Professional detail and odor treatment",
+      "kind": "repair",
+      "description": "Full interior and exterior detail, engine bay clean, ozone odor treatment.",
+      "cost": 250,
+      "value_lift": 600,
+      "net_gain": 350,
+      "days_added": 1,
+      "recommended": true,
+      "reason": "Clean, fresh-smelling cars photograph better and draw more early bids.",
+      "salvage_value_lift": 200
+    },
+    {
+      "id": "tires",
+      "name": "Replace worn tires",
+      "kind": "repair",
+      "description": "Current tread is about 4/32\". Four mid-tier all-season tires, mounted and balanced.",
+      "cost": 780,
+      "value_lift": 1100,
+      "net_gain": 320,
+      "days_added": 1,
+      "recommended": true,
+      "reason": "Buyers deduct the full retail price of tires below 5/32\", more than this costs you.",
+      "salvage_value_lift": 300
+    },
+    {
+      "id": "seat_bolster",
+      "name": "Driver seat bolster repair",
+      "kind": "repair",
+      "description": "Re-dye and reinforce the worn outer bolster on the driver seat.",
+      "cost": 180,
+      "value_lift": 250,
+      "net_gain": 70,
+      "days_added": 1,
+      "recommended": true,
+      "reason": "Small gain, but it removes the only wear item on the condition report.",
+      "salvage_value_lift": 50
+    },
+    {
+      "id": "cargo_liner",
+      "name": "Add all-weather mats and cargo liner",
+      "kind": "upgrade",
+      "description": "OEM-style all-weather floor mats and a molded cargo liner.",
+      "cost": 220,
+      "value_lift": 100,
+      "net_gain": -120,
+      "days_added": 0,
+      "recommended": false,
+      "reason": "Nice to have, but wholesale buyers barely price accessories.",
+      "salvage_value_lift": 30
+    },
+    {
+      "id": "tint",
+      "name": "Window tint",
+      "kind": "upgrade",
+      "description": "Ceramic tint on side and rear windows.",
+      "cost": 300,
+      "value_lift": 50,
+      "net_gain": -250,
+      "days_added": 1,
+      "recommended": false,
+      "reason": "Tint is a personal preference and some buyers will want it removed.",
+      "salvage_value_lift": 20
+    }
+  ],
+  "scenarios": [
+    {
+      "channel": "acv_wholesale",
+      "as_is": {
+        "p10": 28100,
+        "p50": 29200,
+        "p90": 30100
+      },
+      "reconditioned": {
+        "net": {
+          "p10": 28700,
+          "p50": 29860,
+          "p90": 30800
+        },
+        "breakdown": {
+          "expected_price": 32450,
+          "fees": 470,
+          "transport": 250,
+          "recon": 1510,
+          "holding": 210,
+          "risk": 150
+        },
+        "days_to_sell": 7
+      },
+      "net_change": 660,
+      "explanation": "Fresh tires and a full detail push this RAV4 into the top grade bracket. Dealers pay for frontline-ready inventory, so the work more than pays for itself."
+    },
+    {
+      "channel": "copart_salvage",
+      "as_is": {
+        "p10": 19500,
+        "p50": 21000,
+        "p90": 22300
+      },
+      "reconditioned": {
+        "net": {
+          "p10": 18800,
+          "p50": 20310,
+          "p90": 21600
+        },
+        "breakdown": {
+          "expected_price": 23100,
+          "fees": 920,
+          "transport": 300,
+          "recon": 1210,
+          "holding": 260,
+          "risk": 100
+        },
+        "days_to_sell": 12
+      },
+      "net_change": -690,
+      "explanation": "Salvage buyers bid on the car's parts and repair potential, not its presentation. Reconditioning before a salvage sale loses money."
+    }
+  ],
+  "recommended_channel": "acv_wholesale",
+  "verdict": "recondition",
+  "package_cost": 1210
+}

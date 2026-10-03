@@ -7,6 +7,7 @@ import type { RouteResponse } from "@/lib/types";
 import DamageCard from "./DamageCard";
 import HeroCard from "./HeroCard";
 import RangeChart from "./RangeChart";
+import ReconditionCTA from "./ReconditionCTA";
 import RouteOption from "./RouteOption";
 import StartSellingBar from "./StartSellingBar";
 import VehicleSummary from "./VehicleSummary";
@@ -65,6 +66,7 @@ export default function Results({ result, onBack }: Props) {
                 />
               ))}
             </div>
+            <ReconditionCTA vehicle={result.vehicle} />
           </section>
           <StartSellingBar
             channel={selectedRoute?.channel ?? null}

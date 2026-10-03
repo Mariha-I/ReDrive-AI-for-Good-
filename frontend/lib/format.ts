@@ -28,3 +28,8 @@ export function formatPanel(panel: string): string {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
+
+/** e.g. +$660 or −$690 */
+export function formatSignedMoney(value: number): string {
+  return `${value >= 0 ? "+" : "−"}${usd.format(Math.abs(value))}`;
+}

@@ -1,0 +1,121 @@
+{
+  "vehicle": {
+    "vin": "1HGCV1F34LA000002",
+    "year": 2020,
+    "make": "Honda",
+    "model": "Accord",
+    "trim": "Sport",
+    "mileage": 64000
+  },
+  "items": [
+    {
+      "id": "pdr",
+      "name": "Paintless dent repair (hood, roof, trunk lid)",
+      "kind": "repair",
+      "description": "PDR technician removes hail dents without repainting. Factory paint stays intact.",
+      "cost": 2400,
+      "value_lift": 3900,
+      "net_gain": 1500,
+      "days_added": 5,
+      "recommended": true,
+      "reason": "Removes the hail disclosure entirely, so buyers bid it as a clean car.",
+      "salvage_value_lift": 1050
+    },
+    {
+      "id": "detail",
+      "name": "Detail and light paint correction",
+      "kind": "repair",
+      "description": "One-step polish to remove swirl marks after PDR, plus interior detail.",
+      "cost": 300,
+      "value_lift": 450,
+      "net_gain": 150,
+      "days_added": 1,
+      "recommended": true,
+      "reason": "Finishes the PDR work so the panels look uniform in photos.",
+      "salvage_value_lift": 150
+    },
+    {
+      "id": "hood_replace",
+      "name": "Replace and repaint hood",
+      "kind": "repair",
+      "description": "New hood panel, painted and blended to match.",
+      "cost": 1900,
+      "value_lift": 1300,
+      "net_gain": -600,
+      "days_added": 6,
+      "recommended": false,
+      "reason": "PDR fixes the hood for less, and a repaint shows up on paint-meter readings.",
+      "salvage_value_lift": 700
+    },
+    {
+      "id": "ceramic",
+      "name": "Ceramic coating",
+      "kind": "upgrade",
+      "description": "Two-year ceramic paint protection.",
+      "cost": 600,
+      "value_lift": 150,
+      "net_gain": -450,
+      "days_added": 1,
+      "recommended": false,
+      "reason": "Buyers don't pay extra for coatings on a used sedan.",
+      "salvage_value_lift": 0
+    }
+  ],
+  "scenarios": [
+    {
+      "channel": "acv_wholesale",
+      "as_is": {
+        "p10": 15400,
+        "p50": 16500,
+        "p90": 17300
+      },
+      "reconditioned": {
+        "net": {
+          "p10": 17000,
+          "p50": 18150,
+          "p90": 19000
+        },
+        "breakdown": {
+          "expected_price": 22150,
+          "fees": 450,
+          "transport": 250,
+          "recon": 2700,
+          "holding": 450,
+          "risk": 150
+        },
+        "days_to_sell": 11
+      },
+      "net_change": 1650,
+      "explanation": "With the hail removed, this sells as a clean-title, clean-body Accord. The jump in bids is far bigger than the repair bill, and arbitration risk drops too."
+    },
+    {
+      "channel": "copart_salvage",
+      "as_is": {
+        "p10": 12000,
+        "p50": 13100,
+        "p90": 14100
+      },
+      "reconditioned": {
+        "net": {
+          "p10": 10200,
+          "p50": 11300,
+          "p90": 12300
+        },
+        "breakdown": {
+          "expected_price": 15800,
+          "fees": 900,
+          "transport": 300,
+          "recon": 2700,
+          "holding": 500,
+          "risk": 100
+        },
+        "days_to_sell": 14
+      },
+      "net_change": -1800,
+      "explanation": "Salvage buyers expect to do repairs themselves, so they won't pay you back for dent work. Sell as-is if you sell here."
+    }
+  ],
+  "recommended_channel": "acv_wholesale",
+  "verdict": "recondition",
+  "package_cost": 2700
+}

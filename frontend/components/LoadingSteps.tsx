@@ -4,9 +4,20 @@ import { useEffect, useState } from "react";
 
 const STEP_MS = 900;
 
-export default function LoadingSteps({ count = 1 }: { count?: number }) {
+export interface LoadingStep {
+  label: string;
+  detail: string;
+}
+
+interface Props {
+  count?: number;
+  /** Overrides the default three steps */
+  steps?: [LoadingStep, LoadingStep, LoadingStep];
+}
+
+export default function LoadingSteps({ count = 1, steps }: Props) {
   const many = count > 1;
-  const STEPS = [
+  const STEPS = steps ?? [
     { label: many ? `Decoding ${count} VINs…` : "Decoding VIN…", detail: "Year, make, model and trim" },
     { label: "Reading damage…", detail: "Checking photos panel by panel" },
     { label: "Pricing routes…", detail: many ? "Building your multi-unit projection" : "Comparing your selling options" },
