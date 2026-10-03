@@ -1,0 +1,15 @@
+# Python virtual environment
+backend/.venv/
+
+# Environment variables / API keys
+backend/.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# ML model files
+*.joblib
+
+# VS Code
+.vscode/
